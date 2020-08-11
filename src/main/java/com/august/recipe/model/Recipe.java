@@ -1,7 +1,15 @@
 package com.august.recipe.model;
 
-import javax.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+import javax.persistence.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+@Data
 @Entity
 public class Recipe {
 
@@ -9,6 +17,7 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
     private String description;
     private Integer prepTime;
     private Integer cookTime;
@@ -17,81 +26,40 @@ public class Recipe {
     private String url;
     private String directions;
 
+    @Enumerated(value = EnumType.STRING)
+    private Difficulty difficulty;
+
     @Lob
-    Byte[] image;
+    Byte[] image = null;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Notes notes;
 
-    public Long getId() {
-        return id;
+    @ToString.Exclude
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
+    private Set<Ingredient> ingredients = new HashSet<>();
+
+    @ManyToMany()
+    @JoinTable(
+            name = "recipe_category",
+            joinColumns = @JoinColumn(name = "recipe_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
+
+    public void setNotes(Notes notes) {
+        notes.setRecipe(this);
+        this.notes = notes;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void addIngredient(Ingredient ingredient) {
+        ingredient.setRecipe(this);
+        ingredients.add(ingredient);
     }
 
-    public String getDescription() {
-        return description;
+    public void addCategory(Category category) {
+        category.addRecipe(this);
+        categories.add(category);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getPrepTime() {
-        return prepTime;
-    }
-
-    public void setPrepTime(Integer prepTime) {
-        this.prepTime = prepTime;
-    }
-
-    public Integer getCookTime() {
-        return cookTime;
-    }
-
-    public void setCookTime(Integer cookTime) {
-        this.cookTime = cookTime;
-    }
-
-    public Integer getServings() {
-        return servings;
-    }
-
-    public void setServings(Integer servings) {
-        this.servings = servings;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getDirections() {
-        return directions;
-    }
-
-    public void setDirections(String directions) {
-        this.directions = directions;
-    }
-
-    public Byte[] getImage() {
-        return image;
-    }
-
-    public void setImage(Byte[] image) {
-        this.image = image;
-    }
 }

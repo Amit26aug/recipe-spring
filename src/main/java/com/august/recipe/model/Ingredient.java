@@ -2,22 +2,29 @@ package com.august.recipe.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
-@Entity
 @Data
+@Entity
 @EqualsAndHashCode(exclude = {"recipe"})
-public class Notes {
+public class Ingredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    private String description;
+
+    private BigDecimal amount;
+
+    @ManyToOne
     private Recipe recipe;
 
-    @Lob
-    private String recipeNotes;
+    @OneToOne
+    private UnitOfMeasure unitOfMeasure;
+
 
 }
